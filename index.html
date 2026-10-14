@@ -38,7 +38,7 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 25px}
 footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 #cameraPanel{display:none;margin:15px 0 25px;background:#111827;border-radius:20px;padding:12px;color:#fff;overflow:hidden}
 .camera-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin:2px 3px 12px}
-.processing-screen{display:none;position:relative;min-height:clamp(270px,62vw,440px);max-height:65vh;overflow:hidden;border-radius:12px;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:radial-gradient(ellipse at 50% 42%,#27346b 0%,#111827 58%,#05070b 100%);isolation:isolate}
+.processing-screen{display:none;position:relative;min-height:clamp(270px,62vw,440px);max-height:65vh;overflow:hidden;border-radius:12px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#fff;isolation:isolate}.processing-screen:before{content:none}.mascot-art{width:min(100%,340px);height:clamp(205px,52vw,290px);display:flex;align-items:center;justify-content:center}.mascot-art svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 8px 8px #0b74d01a);animation:mascotBounce .8s ease-in-out infinite alternate}.processing-screen .processing-title{font-size:clamp(29px,7vw,38px);font-weight:800;letter-spacing:-.6px;text-align:center;color:#1877f2;background:none;-webkit-text-fill-color:#1877f2;text-shadow:none}.processing-screen .processing-subtitle{font-size:14px;color:#64748b;text-align:center;margin:0 16px 18px}
 .processing-screen:before{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent 0 22%,#8b5cf633 25%,transparent 31% 48%,#22d3ee33 52%,transparent 58% 75%,#fb718533 80%,transparent 86%);animation:snailGalaxy 2.2s linear infinite;z-index:-1}
 #cameraPanel.is-processing .camera-stage,#cameraPanel.is-processing .camera-instructions,#cameraPanel.is-processing .camera-controls{display:none}
 #cameraPanel.is-processing .processing-screen{display:flex}
@@ -51,6 +51,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 .processing-title{font-size:clamp(27px,7vw,36px);font-weight:900;letter-spacing:.3px;text-align:center;background:linear-gradient(90deg,#67e8f9,#c4b5fd,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 24px #818cf866}
 .processing-subtitle{font-size:14px;color:#e5e7eb;text-align:center;margin:0 16px 22px}
 .processing-dots:after{content:"";animation:processingDots 1s steps(4,end) infinite}
+@keyframes mascotBounce{from{transform:translateY(0) rotate(-1deg)}to{transform:translateY(-7px) rotate(1deg)}}
 @keyframes snailZoom{from{transform:translateX(-34vw) rotate(-12deg) scale(.82)}to{transform:translateX(34vw) rotate(12deg) scale(1.12)}}
 @keyframes snailSpin{to{transform:rotate(360deg)}}
 @keyframes snailGalaxy{to{transform:rotate(360deg)}}
@@ -87,9 +88,31 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     <section id="cameraPanel" aria-label="Leitor de números pela câmara">
       <div class="camera-top"><span>Enquadrar os 9 algarismos</span><button id="closeCamera" class="closecam" type="button" aria-label="Fechar câmara">✕</button></div>
       <div class="processing-screen" id="processingScreen" role="status" aria-live="polite">
-        <div class="snail-track"><div class="speed-lines"></div><div class="snail-orbit"></div><span class="snail-emoji" aria-hidden="true">🐌</span></div>
+        <div class="mascot-art" aria-hidden="true">
+          <svg viewBox="0 0 360 285" role="img" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="heartRed" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff333b"/><stop offset="1" stop-color="#d90020"/></linearGradient><linearGradient id="coneGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6c36b"/><stop offset="1" stop-color="#b86b24"/></linearGradient></defs>
+            <path d="M34 92 L8 83 M46 130 L12 130 M54 169 L22 183" stroke="#8ccfff" stroke-width="5" stroke-linecap="round"/>
+            <path d="M98 45 C66 10 20 43 32 85 C42 119 91 155 142 177 C190 143 232 107 237 72 C243 27 190 10 157 45 C138 23 116 27 98 45Z" fill="url(#heartRed)" stroke="#c91b30" stroke-width="3"/>
+            <path d="M99 61 C77 37 49 56 56 81 C64 104 100 131 141 151 C176 124 210 95 213 72 C216 48 186 38 160 66 C139 49 117 47 99 61Z" fill="#fff"/>
+            <path d="M84 80 Q97 65 111 81 M151 80 Q166 64 179 80" fill="none" stroke="#24212a" stroke-width="7" stroke-linecap="round"/>
+            <path d="M102 104 Q138 135 175 102 Q165 143 132 139 Q111 132 102 104Z" fill="#3b1420"/>
+            <path d="M121 119 Q141 129 160 118" fill="none" stroke="#ff7882" stroke-width="7" stroke-linecap="round"/>
+            <path d="M79 150 Q55 181 82 203 L113 190 L126 162" fill="none" stroke="#e91d35" stroke-width="18" stroke-linecap="round"/>
+            <path d="M178 155 Q207 181 196 211" fill="none" stroke="#e91d35" stroke-width="18" stroke-linecap="round"/>
+            <path d="M66 200 L92 205 L86 225 Q71 236 53 220Z" fill="#e8f5ff" stroke="#d7dce5" stroke-width="3"/>
+            <path d="M178 207 L204 211 L218 228 Q207 241 185 230Z" fill="#e8f5ff" stroke="#d7dce5" stroke-width="3"/>
+            <path d="M209 82 L257 202 L298 89Z" fill="url(#coneGold)" stroke="#9a5a2c" stroke-width="3"/>
+            <path d="M221 111 L285 116 M229 139 L275 144 M238 166 L265 169 M233 110 L252 171 M259 105 L272 147" stroke="#9b5b2c" stroke-width="3" opacity=".8"/>
+            <path d="M207 82 Q203 52 228 47 Q247 40 260 57 Q278 39 296 57 Q316 75 298 94 L257 112Z" fill="#fff5df" stroke="#ead7bc" stroke-width="3"/>
+            <path d="M225 73 Q246 61 261 75 Q278 60 294 75" fill="none" stroke="#6a351f" stroke-width="7" stroke-linecap="round"/>
+            <path d="M211 83 Q239 93 261 84 Q284 93 302 79" fill="none" stroke="#5b2b1a" stroke-width="5" stroke-linecap="round"/>
+            <path d="M189 106 Q209 106 218 91" fill="none" stroke="#e91d35" stroke-width="14" stroke-linecap="round"/>
+            <path d="M182 104 Q196 95 205 104" fill="none" stroke="#ff8c98" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="112" cy="92" r="5" fill="#ff9aa2"/><circle cx="174" cy="93" r="5" fill="#ff9aa2"/>
+          </svg>
+        </div>
         <div class="processing-title">Reading<span class="processing-dots"></span></div>
-        <p class="processing-subtitle">A procurar os 9 algarismos…</p>
+        <p class="processing-subtitle">A procurar os 9 algarismos</p>
       </div>
       <div class="camera-stage">
         <video id="cameraVideo" autoplay muted playsinline></video>
@@ -139,7 +162,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V8.1 · câmara OCR</footer>
+  <footer>Barcode Generator V8.2 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
