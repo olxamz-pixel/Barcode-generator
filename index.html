@@ -40,15 +40,15 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 .camera-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin:2px 3px 12px}
 .processing-screen{display:none;position:relative;min-height:clamp(270px,62vw,440px);max-height:65vh;overflow:hidden;border-radius:12px;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:radial-gradient(ellipse at 50% 42%,#27346b 0%,#111827 58%,#05070b 100%);isolation:isolate}
 .processing-screen:before{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent 0 22%,#8b5cf633 25%,transparent 31% 48%,#22d3ee33 52%,transparent 58% 75%,#fb718533 80%,transparent 86%);animation:snailGalaxy 2.2s linear infinite;z-index:-1}
-.cameraPanel.is-processing .camera-stage,.cameraPanel.is-processing .camera-instructions,.cameraPanel.is-processing .camera-controls{display:none}
+#cameraPanel.is-processing .camera-stage,#cameraPanel.is-processing .camera-instructions,#cameraPanel.is-processing .camera-controls{display:none}
 #cameraPanel.is-processing .processing-screen{display:flex}
 .snail-track{position:relative;width:100%;height:150px;display:flex;align-items:center;overflow:hidden}
 .snail-track:before,.snail-track:after{content:"";position:absolute;left:-45%;width:190%;height:3px;background:linear-gradient(90deg,transparent,#22d3ee,#a78bfa,#fb7185,#facc15,transparent);filter:blur(.4px);animation:speedLines .42s linear infinite}
 .snail-track:after{height:1px;top:36px;animation-duration:.28s;opacity:.7}
 .speed-lines{position:absolute;inset:0;background:repeating-linear-gradient(174deg,transparent 0 22px,#ffffff38 23px 25px,transparent 26px 47px);mask-image:linear-gradient(90deg,transparent,#000 25%,#000 80%,transparent);animation:speedLines .24s linear infinite}
-.snail-emoji{position:absolute;left:calc(50% - 42px);font-size:76px;line-height:1;filter:drop-shadow(0 0 14px #a78bfa) drop-shadow(0 0 28px #22d3ee);animation:snailZoom .38s ease-in-out infinite alternate}
+.snail-emoji{position:absolute;left:calc(50% - 42px);font-size:76px;line-height:1;filter:hue-rotate(145deg) saturate(1.25) brightness(1.12) drop-shadow(0 0 14px #a78bfa) drop-shadow(0 0 28px #22d3ee);animation:snailZoom .38s ease-in-out infinite alternate}
 .snail-orbit{position:absolute;width:120px;height:120px;border:2px solid transparent;border-top-color:#22d3ee;border-right-color:#f472b6;border-radius:50%;left:calc(50% - 60px);animation:snailSpin .35s linear infinite}
-.processing-title{font-size:clamp(21px,5vw,28px);font-weight:900;letter-spacing:.3px;text-align:center;background:linear-gradient(90deg,#67e8f9,#c4b5fd,#f9a8d4,#fde68a);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 24px #818cf866}
+.processing-title{font-size:clamp(27px,7vw,36px);font-weight:900;letter-spacing:.3px;text-align:center;background:linear-gradient(90deg,#67e8f9,#c4b5fd,#a5b4fc);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 24px #818cf866}
 .processing-subtitle{font-size:14px;color:#e5e7eb;text-align:center;margin:0 16px 22px}
 .processing-dots:after{content:"";animation:processingDots 1s steps(4,end) infinite}
 @keyframes snailZoom{from{transform:translateX(-34vw) rotate(-12deg) scale(.82)}to{transform:translateX(34vw) rotate(12deg) scale(1.12)}}
@@ -88,8 +88,8 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
       <div class="camera-top"><span>Enquadrar os 9 algarismos</span><button id="closeCamera" class="closecam" type="button" aria-label="Fechar câmara">✕</button></div>
       <div class="processing-screen" id="processingScreen" role="status" aria-live="polite">
         <div class="snail-track"><div class="speed-lines"></div><div class="snail-orbit"></div><span class="snail-emoji" aria-hidden="true">🐌</span></div>
-        <div class="processing-title">CARACOL HYPER SPEED</div>
-        <p class="processing-subtitle">A correr à velocidade da luz para encontrar o BC128<span class="processing-dots"></span></p>
+        <div class="processing-title">Reading<span class="processing-dots"></span></div>
+        <p class="processing-subtitle">A procurar os 9 algarismos…</p>
       </div>
       <div class="camera-stage">
         <video id="cameraVideo" autoplay muted playsinline></video>
@@ -139,7 +139,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V8 · câmara OCR · gratuito</footer>
+  <footer>Barcode Generator V8.1 · câmara OCR</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
