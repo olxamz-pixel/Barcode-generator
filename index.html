@@ -76,7 +76,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
           </div>
         </div>
       </div>
-      <p class="camera-instructions" id="cameraInstructions">Enquadra o número completo e mantém o telemóvel imóvel. Carrega em “Tirar foto e gerar código”. A aplicação analisa várias zonas e versões da imagem antes de gerar o Code 128.</p>
+      <p class="camera-instructions" id="cameraInstructions">Enquadra os 9 algarismos e carrega em “Tirar foto e gerar código”. A leitura termina assim que encontra um número válido.</p>
       <div class="camera-controls">
         <button class="capture" id="captureBtn" type="button">◎ Tirar foto e gerar código</button>
         <button class="closecam" id="cancelCamera" type="button">Cancelar</button>
@@ -129,7 +129,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
  function tell(s){msg.textContent=s}
  function setStatus(s){document.getElementById('statusText').textContent=s}
  const diagPanel=document.getElementById('diagnosticPanel'),diagState=document.getElementById('diagState'),diagText=document.getElementById('diagText'),diagMeta=document.getElementById('diagMeta'),candidateChoices=document.getElementById('candidateChoices');
- function diagnostic(state,raw='',meta=''){diagPanel.style.display='block';diagState.textContent=state;diagText.textContent=raw||'(o OCR não devolveu texto)';diagMeta.textContent=meta;diagPanel.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ function diagnostic(state,raw='',meta=''){ /* Diagnóstico técnico removido do fluxo normal para não atrasar a leitura. */ }
  function showCandidates(values){candidateChoices.innerHTML='';if(!values||!values.length)return;const label=document.createElement('p');label.style.cssText='width:100%;margin:8px 0 2px;font-weight:700';label.textContent='Escolhe o número correto para gerar o Code 128:';candidateChoices.appendChild(label);values.forEach(value=>{const b=document.createElement('button');b.type='button';b.textContent=value;b.style.cssText='border:0;border-radius:10px;padding:12px 15px;background:#2860e8;color:#fff;font-weight:800;font:inherit';b.addEventListener('click',()=>{draw(value);tell('Número confirmado: '+value+'. Code 128 gerado.');diagnostic('Code 128 gerado para '+value,diagText.textContent,'Número escolhido manualmente a partir dos candidatos detetados.');candidateChoices.innerHTML='';closeCamera()});candidateChoices.appendChild(b)})}
  function draw(value,add=true){
    if(!/^\d{9}$/.test(value)){tell('Introduza exatamente 9 algarismos.');return}
@@ -312,27 +312,25 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        const raw=(result.data.text||'').trim();const conf=Math.round(Number(result.data.confidence)||0);
        rawReports.push('['+v.name+' | confiança '+conf+'%]\n'+(raw||'(sem texto reconhecido)'));
        totalConfidence.push(conf);
-       extractCandidates(raw).forEach(n=>scores.set(n,Math.max(scores.get(n)||0,conf)));
+       const foundNow=extractCandidates(raw);\n       foundNow.forEach(n=>scores.set(n,Math.max(scores.get(n)||0,conf)));\n       // Stop at the first complete 9-digit candidate to avoid unnecessary OCR passes.\n       if(foundNow.length===1)break;
        diagnostic('Passo 3/4: concluída análise '+(i+1)+' de '+variants.length+'.',rawReports.join('\n\n'),'Confiança OCR por imagem: '+totalConfidence.join('%, ')+'%.');
      }
      const ranked=[...scores.entries()].sort((a,b)=>b[1]-a[1]);
      const report=rawReports.join('\n\n');
      if(ranked.length===1){
        const value=ranked[0][0];draw(value);tell('Número reconhecido: '+value+'. Code 128 gerado.');candidateChoices.innerHTML='';
-       diagnostic('Passo 4/4: sucesso — número reconhecido: '+value,report,'Número candidato selecionado. A percentagem é uma estimativa interna do reconhecimento OCR, não uma garantia de precisão do código de barras.');
+       diagnostic('sucesso');
        if(fromCamera)closeCamera();
      }else if(ranked.length>1){
-       diagnostic('Passo 4/4: foram encontrados vários números possíveis: '+ranked.map(x=>x[0]).join(', '),report,'Para evitar gerar um código errado, não escolhi automaticamente. Se um dos candidatos corresponder ao número impresso, toca nele para gerar o Code 128.');
-       showCandidates(ranked.map(x=>x[0]));tell('Foram detetados vários números possíveis. Escolhe o correto no diagnóstico abaixo.');
+       tell('Foram encontrados vários números possíveis ('+ranked.map(x=>x[0]).join(', ')+'). Tenta novamente com os 9 algarismos mais nítidos e centrados.');
      }else{
-       diagnostic('Passo 4/4: a fotografia foi capturada, mas não foram reconhecidos 9 algarismos.',report,'A imagem foi analisada em 7 modos, começando pelo recorte alinhado com a mira azul. Se o texto estiver vazio, a causa provável é o motor OCR/bloqueio de scripts ou uma imagem pouco nítida. Se aparecerem dígitos incompletos, aproxima a câmara e mantém o número inteiro visível.');
-       tell('Fotografia capturada, mas o número não foi reconhecido. Consulta o diagnóstico abaixo.');
+       tell('Não consegui ler os 9 algarismos. Aproxima a câmara, melhora a luz e tenta novamente.');
        setStatus('A aguardar número legível');
      }
    }catch(e){
      console.error('Barcode Generator V8 diagnostic error:',e);
      const detail=(e&&e.message)?e.message:String(e);
-     diagnostic('ERRO durante a leitura: '+detail,'','Detalhe técnico: '+(e&&e.name?e.name:'Erro')+'. Se precisares de ajuda, envia uma captura de ecrã desta caixa de diagnóstico.');
+     diagnostic('erro');
      tell('Erro na leitura: '+detail);
    }finally{
      if(objectUrl)URL.revokeObjectURL(objectUrl);
