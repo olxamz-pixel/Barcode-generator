@@ -312,7 +312,10 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        const raw=(result.data.text||'').trim();const conf=Math.round(Number(result.data.confidence)||0);
        rawReports.push('['+v.name+' | confiança '+conf+'%]\n'+(raw||'(sem texto reconhecido)'));
        totalConfidence.push(conf);
-       const foundNow=extractCandidates(raw);\n       foundNow.forEach(n=>scores.set(n,Math.max(scores.get(n)||0,conf)));\n       // Stop at the first complete 9-digit candidate to avoid unnecessary OCR passes.\n       if(foundNow.length===1)break;
+       const foundNow=extractCandidates(raw);
+       foundNow.forEach(n=>scores.set(n,Math.max(scores.get(n)||0,conf)));
+       // Stop at the first complete 9-digit candidate to avoid unnecessary OCR passes.
+       if(foundNow.length===1)break;
        diagnostic('Passo 3/4: concluída análise '+(i+1)+' de '+variants.length+'.',rawReports.join('\n\n'),'Confiança OCR por imagem: '+totalConfidence.join('%, ')+'%.');
      }
      const ranked=[...scores.entries()].sort((a,b)=>b[1]-a[1]);
