@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V8.5 · GROP3</title>
+<title>Barcode Generator V8.6 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -88,7 +88,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     <section id="cameraPanel" aria-label="Leitor de números pela câmara">
       <div class="camera-top"><span>Enquadrar os 9 algarismos</span><button id="closeCamera" class="closecam" type="button" aria-label="Fechar câmara">✕</button></div>
       <div class="processing-screen" id="processingScreen" role="status" aria-live="polite">
-        <div class="mascot-art mascot-walk" aria-hidden="true"><img src="./cornetto-walk.gif" alt="Cornetto a caminhar e lamber o gelado" style="width:100%;height:100%;object-fit:contain"></div>
+        <div class="mascot-art mascot-walk" aria-hidden="true" style="overflow:hidden;position:relative"><img src="./cornetto-walk.gif" alt="Cornetto a caminhar e lamber o gelado" style="position:absolute;top:0;left:0;width:100%;height:145%;object-fit:cover;object-position:top"></div>
         <div class="processing-title">Reading<span class="processing-dots"></span></div>
         <p class="processing-subtitle">A procurar os 9 algarismos</p>
       </div>
@@ -140,7 +140,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V8.5 · GROP3</footer>
+  <footer>Barcode Generator V8.6 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
