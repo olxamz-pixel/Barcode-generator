@@ -108,8 +108,11 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
   <section id="diagnosticPanel" style="margin-top:18px;padding:16px;border:1px solid #f0c36d;border-radius:16px;background:#fffaf0;color:#422006;display:none">
     <strong>Diagnóstico da leitura</strong>
     <p id="diagState" style="margin:8px 0;line-height:1.45">À espera de uma fotografia.</p>
-    <p style="margin:8px 0 4px;font-weight:700">Texto detetado pelo OCR</p>
-    <pre id="diagText" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:10px;border-radius:8px;min-height:42px;font:14px/1.4 monospace">(ainda sem resultado)</pre>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-weight:700;padding:8px 0">Ver relatório técnico OCR</summary>
+      <p style="margin:4px 0;font-size:13px;color:#78350f">Resultados brutos das diferentes tentativas. Podem conter números fragmentados e não representam, por si só, a confiança do código de barras.</p>
+      <pre id="diagText" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:10px;border-radius:8px;min-height:42px;font:14px/1.4 monospace">(ainda sem resultado)</pre>
+    </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
   <footer>Barcode Generator V8 · câmara OCR · gratuito</footer>
@@ -316,7 +319,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
      const report=rawReports.join('\n\n');
      if(ranked.length===1){
        const value=ranked[0][0];draw(value);tell('Número reconhecido: '+value+'. Code 128 gerado.');candidateChoices.innerHTML='';
-       diagnostic('Passo 4/4: sucesso — número reconhecido: '+value,report,'Candidato encontrado. Confiança aproximada: '+ranked[0][1]+'%.');
+       diagnostic('Passo 4/4: sucesso — número reconhecido: '+value,report,'Número candidato selecionado. A percentagem é uma estimativa interna do reconhecimento OCR, não uma garantia de precisão do código de barras.');
        if(fromCamera)closeCamera();
      }else if(ranked.length>1){
        diagnostic('Passo 4/4: foram encontrados vários números possíveis: '+ranked.map(x=>x[0]).join(', '),report,'Para evitar gerar um código errado, não escolhi automaticamente. Se um dos candidatos corresponder ao número impresso, toca nele para gerar o Code 128.');
