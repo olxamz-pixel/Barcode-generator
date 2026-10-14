@@ -271,7 +271,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
      // Try normal grayscale, high contrast and inverted contrast at several page segmentation modes.
      function makeVariant(x,y,cw,ch,mode){
        const canvas=document.createElement('canvas');
-       const scale=Math.min(2.6,Math.max(1.6,1900/Math.max(cw,ch)));
+       const scale=Math.min(1.8,Math.max(1,1500/Math.max(cw,ch)));
        canvas.width=Math.max(1,Math.round(cw*scale));canvas.height=Math.max(1,Math.round(ch*scale));
        const ctx=canvas.getContext('2d',{willReadFrequently:true});
        ctx.drawImage(source,x,y,cw,ch,0,0,canvas.width,canvas.height);
@@ -289,15 +289,12 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        }
        return canvas;
      }
+     // Fast path: start with the whole image at a controlled resolution, then use two focused fallbacks.
+     // Fewer, smaller OCR inputs reduce latency while preserving recovery options.
      const variants=[
-       // The full-frame OCR is currently the reliable pass; try it first, then the reticle crop.
-       {name:'Imagem completa normal',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'11'},
-       {name:'Mira azul (recorte alinhado)',canvas:cropAndPrepare(source,true),psm:'7'},
-       {name:'Imagem completa em bloco',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'6'},
-       {name:'Zona central ampla',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'normal'),psm:'6'},
+       {name:'Imagem completa',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'11'},
+       {name:'Zona central',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'normal'),psm:'6'},
        {name:'Zona central alto contraste',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'contrast'),psm:'7'},
-       {name:'Zona central contraste invertido',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'invert'),psm:'7'},
-       {name:'Faixa central horizontal',canvas:makeVariant(Math.round(sw*.02),Math.round(sh*.30),Math.round(sw*.96),Math.round(sh*.42),'normal'),psm:'13'},
      ];
      let rawReports=[],scores=new Map(),totalConfidence=[];
      for(let i=0;i<variants.length;i++){
