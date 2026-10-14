@@ -268,6 +268,8 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        // Freeze the current video frame before starting OCR.
        const snap=document.createElement('canvas');snap.width=video.videoWidth;snap.height=video.videoHeight;
        snap.getContext('2d').drawImage(video,0,0,snap.width,snap.height);source=snap;
+       // Release the camera as soon as the still frame is captured; show the reading animation during OCR.
+       if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}video.srcObject=null;
      }else{
        objectUrl=URL.createObjectURL(file);
        source=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Não foi possível abrir a fotografia selecionada.'));img.src=objectUrl});
@@ -357,6 +359,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
      const detail=(e&&e.message)?e.message:String(e);
      diagnostic('erro');
      tell('Erro na leitura: '+detail);
+     if(fromCamera)closeCamera();
    }finally{
      if(objectUrl)URL.revokeObjectURL(objectUrl);
      busy=false;cameraPanel.classList.remove('is-processing');if(captureButton){captureButton.disabled=false;captureButton.textContent='◎ Tirar foto e gerar código'}
