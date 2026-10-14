@@ -112,7 +112,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     <pre id="diagText" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#fff;padding:10px;border-radius:8px;min-height:42px;font:14px/1.4 monospace">(ainda sem resultado)</pre>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V7 · câmara OCR · gratuito</footer>
+  <footer>Barcode Generator V8 · câmara OCR · gratuito</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -287,9 +287,9 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        return canvas;
      }
      const variants=[
-       // Test the blue reticle first; the rest of the frame contains dates and other digits that confuse OCR.
-       {name:'Mira azul (recorte alinhado)',canvas:cropAndPrepare(source,true),psm:'7'},
+       // The full-frame OCR is currently the reliable pass; try it first, then the reticle crop.
        {name:'Imagem completa normal',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'11'},
+       {name:'Mira azul (recorte alinhado)',canvas:cropAndPrepare(source,true),psm:'7'},
        {name:'Imagem completa em bloco',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'6'},
        {name:'Zona central ampla',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'normal'),psm:'6'},
        {name:'Zona central alto contraste',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'contrast'),psm:'7'},
