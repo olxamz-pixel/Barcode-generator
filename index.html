@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V7 Câmara OCR</title>
+<title>Barcode Generator V8 Câmara OCR</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -178,7 +178,9 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
      if(sourceRatio>displayRatio) visibleW=sh*displayRatio;
      else visibleH=sw/displayRatio;
      sw2=Math.round(visibleW*.88); sh2=Math.round(visibleH*.23);
-     sx=Math.round((sw-sw2)/2); sy=Math.round((sh-sh2)/2);
+     // Align the OCR crop with the blue reticle in the current mobile preview (slightly above frame centre).
+     sx=Math.round((sw-visibleW)/2 + (visibleW-sw2)/2);
+     sy=Math.round((sh-visibleH)/2 + visibleH*.42 - sh2/2);
    }
    const canvas=document.createElement('canvas');
    // Upscale cropped area to help OCR read small digits.
@@ -285,14 +287,14 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        return canvas;
      }
      const variants=[
+       // Test the blue reticle first; the rest of the frame contains dates and other digits that confuse OCR.
+       {name:'Mira azul (recorte alinhado)',canvas:cropAndPrepare(source,true),psm:'7'},
        {name:'Imagem completa normal',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'11'},
        {name:'Imagem completa em bloco',canvas:makeVariant(0,0,sw,sh,'normal'),psm:'6'},
        {name:'Zona central ampla',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'normal'),psm:'6'},
        {name:'Zona central alto contraste',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'contrast'),psm:'7'},
        {name:'Zona central contraste invertido',canvas:makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'invert'),psm:'7'},
        {name:'Faixa central horizontal',canvas:makeVariant(Math.round(sw*.02),Math.round(sh*.30),Math.round(sw*.96),Math.round(sh*.42),'normal'),psm:'13'},
-       // Extra attempt: crop the exact area shown inside the blue camera reticle, accounting for object-fit: cover.
-       {name:'Mira azul (recorte exato)',canvas:cropAndPrepare(source,true),psm:'7'}
      ];
      let rawReports=[],scores=new Map(),totalConfidence=[];
      for(let i=0;i<variants.length;i++){
@@ -320,12 +322,12 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
        diagnostic('Passo 4/4: foram encontrados vários números possíveis: '+ranked.map(x=>x[0]).join(', '),report,'Para evitar gerar um código errado, não escolhi automaticamente. Se um dos candidatos corresponder ao número impresso, toca nele para gerar o Code 128.');
        showCandidates(ranked.map(x=>x[0]));tell('Foram detetados vários números possíveis. Escolhe o correto no diagnóstico abaixo.');
      }else{
-       diagnostic('Passo 4/4: a fotografia foi capturada, mas não foram reconhecidos 9 algarismos.',report,'A imagem foi analisada em várias zonas, incluindo o recorte exato da mira azul. Se o texto estiver vazio, a causa provável é o motor OCR/bloqueio de scripts ou uma imagem pouco nítida. Se aparecerem dígitos incompletos, aproxima a câmara e mantém o número inteiro visível.');
+       diagnostic('Passo 4/4: a fotografia foi capturada, mas não foram reconhecidos 9 algarismos.',report,'A imagem foi analisada em 7 modos, começando pelo recorte alinhado com a mira azul. Se o texto estiver vazio, a causa provável é o motor OCR/bloqueio de scripts ou uma imagem pouco nítida. Se aparecerem dígitos incompletos, aproxima a câmara e mantém o número inteiro visível.');
        tell('Fotografia capturada, mas o número não foi reconhecido. Consulta o diagnóstico abaixo.');
        setStatus('A aguardar número legível');
      }
    }catch(e){
-     console.error('Barcode Generator V7 diagnostic error:',e);
+     console.error('Barcode Generator V8 diagnostic error:',e);
      const detail=(e&&e.message)?e.message:String(e);
      diagnostic('ERRO durante a leitura: '+detail,'','Detalhe técnico: '+(e&&e.name?e.name:'Erro')+'. Se precisares de ajuda, envia uma captura de ecrã desta caixa de diagnóstico.');
      tell('Erro na leitura: '+detail);
