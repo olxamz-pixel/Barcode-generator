@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V8.7 · GROP3</title>
+<title>Barcode Generator V8.8 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -181,12 +181,23 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
  async function openCamera(){
    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){tell('Este navegador não permite abrir a câmara. Abre o site através de HTTPS no Chrome.');return}
    try{
-     stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
+     stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160},frameRate:{ideal:30,max:30}}});
      video.srcObject=stream;cameraPanel.style.display='block';document.getElementById('cameraBtn').classList.remove('primary');
      const track=stream.getVideoTracks()[0];
      if(track&&track.getCapabilities&&track.applyConstraints){
-       try{const caps=track.getCapabilities();if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous'))await track.applyConstraints({advanced:[{focusMode:'continuous'}]});}catch(_){}
+       try{
+         const caps=track.getCapabilities(),advanced=[];
+         if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous'))advanced.push({focusMode:'continuous'});
+         if(Array.isArray(caps.exposureMode)&&caps.exposureMode.includes('continuous'))advanced.push({exposureMode:'continuous'});
+         if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.includes('continuous'))advanced.push({whiteBalanceMode:'continuous'});
+         if(advanced.length)await track.applyConstraints({advanced});
+       }catch(_){}
      }
+     video.addEventListener('click',async()=>{
+       try{const t=stream&&stream.getVideoTracks()[0],caps=t&&t.getCapabilities?t.getCapabilities():{};
+         if(t&&t.applyConstraints&&Array.isArray(caps.focusMode)&&caps.focusMode.includes('single-shot'))await t.applyConstraints({advanced:[{focusMode:'single-shot'}]});
+       }catch(_){}
+     });
      await video.play();cameraPanel.scrollIntoView({behavior:'smooth',block:'center'});tell('Câmara pronta. Centra os 9 algarismos na mira e tira a fotografia.');
      cameraSession++;
    }catch(e){tell('Não foi possível abrir a câmara. Permite o acesso à câmara nas definições do navegador e tenta novamente.')}
