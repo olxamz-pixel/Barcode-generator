@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V8.6 · GROP3</title>
+<title>Barcode Generator V8.7 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -59,8 +59,8 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 @keyframes processingDots{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}
 @media(prefers-reduced-motion:reduce){.snail-emoji,.snail-orbit,.snail-track:before,.snail-track:after,.speed-lines,.processing-screen:before{animation-duration:2s}}
 .camera-stage{position:relative;width:100%;overflow:hidden;border-radius:12px;background:#05070b;aspect-ratio:3/4;max-height:65vh;display:flex;align-items:center;justify-content:center}
-#cameraVideo{width:100%;height:100%;object-fit:cover}
-.aim-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#cameraVideo{width:100%;height:100%;object-fit:contain}
+.aim-overlay{display:none}
 .aim-frame{width:88%;height:23%;position:relative;border:0}
 .corner{position:absolute;width:28px;height:28px;border-color:#65a5ff;border-style:solid}
 .tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:9px 0 0 0}.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 9px 0 0}
@@ -140,7 +140,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V8.6 · GROP3</footer>
+  <footer>Barcode Generator V8.7 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -181,8 +181,12 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
  async function openCamera(){
    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){tell('Este navegador não permite abrir a câmara. Abre o site através de HTTPS no Chrome.');return}
    try{
-     stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}});
+     stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}});
      video.srcObject=stream;cameraPanel.style.display='block';document.getElementById('cameraBtn').classList.remove('primary');
+     const track=stream.getVideoTracks()[0];
+     if(track&&track.getCapabilities&&track.applyConstraints){
+       try{const caps=track.getCapabilities();if(Array.isArray(caps.focusMode)&&caps.focusMode.includes('continuous'))await track.applyConstraints({advanced:[{focusMode:'continuous'}]});}catch(_){}
+     }
      await video.play();cameraPanel.scrollIntoView({behavior:'smooth',block:'center'});tell('Câmara pronta. Centra os 9 algarismos na mira e tira a fotografia.');
      cameraSession++;
    }catch(e){tell('Não foi possível abrir a câmara. Permite o acesso à câmara nas definições do navegador e tenta novamente.')}
