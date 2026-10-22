@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V9.1 · GROP3</title>
+<title>Barcode Generator V9.2 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -88,6 +88,11 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 #cameraPanel:not(.is-processing) .aim-frame .corner.bl{bottom:-2px;left:-2px;border-bottom-width:4px;border-left-width:4px;border-bottom-left-radius:8px}
 #cameraPanel:not(.is-processing) .aim-frame .corner.br{bottom:-2px;right:-2px;border-bottom-width:4px;border-right-width:4px;border-bottom-right-radius:8px}
 #cameraPanel:not(.is-processing) .aim-frame .aim-line{position:absolute;left:0;right:0;top:50%;height:1px;background:#1684ff99}
+
+.history-access{display:flex;justify-content:flex-end;margin:8px 0 2px}
+#historyToggle{border:1px solid #e5eaf1;background:transparent;color:#7b8797;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:600}
+.history-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.history-panel[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -133,9 +138,11 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
       
     </form>
     <div class="toast" id="message" role="status" aria-live="polite"></div>
-    <hr>
-    <div class="recent-head"><span>◷ &nbsp; Recentes</span><button class="clear" id="clearRecent" title="Limpar histórico" aria-label="Limpar histórico">♲</button></div>
-    <div class="recents" id="recents"></div>
+    <div class="history-access"><button type="button" id="historyToggle" aria-expanded="false">◷ Histórico</button></div>
+    <div class="history-panel" id="historyPanel" hidden>
+      <div class="recent-head"><span>Recentes</span><button class="clear" id="clearRecent" title="Limpar histórico" aria-label="Limpar histórico">♲</button></div>
+      <div class="recents" id="recents"></div>
+    </div>
   </section>
   <div class="status"><span class="dot"></span><span id="statusText">Code 128 gerado</span></div>
   <section class="result">
@@ -156,9 +163,18 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V9.1 · GROP3</footer>
+  <footer>Barcode Generator V9.2 · GROP3</footer>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js">
+const historyToggle=document.getElementById('historyToggle');
+const historyPanel=document.getElementById('historyPanel');
+historyToggle.addEventListener('click',()=>{
+  const open=historyPanel.hidden;
+  historyPanel.hidden=!open;
+  historyToggle.setAttribute('aria-expanded',String(open));
+  historyToggle.textContent=open?'× Fechar histórico':'◷ Histórico';
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 (() => {
