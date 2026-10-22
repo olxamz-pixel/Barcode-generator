@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V9.0 · GROP3</title>
+<title>Barcode Generator V9.1 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -72,6 +72,22 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 .capture{background:white;color:#111827}.closecam{background:#374151;color:white}
 @media(max-width:390px){.panel{border-radius:27px}.actions{gap:8px}.action{min-height:58px}.go{flex-basis:50px;height:54px}.camera-stage{aspect-ratio:3/4}}
 @media print{body{background:white}main{width:100%;padding:0}.panel,h1,.subtitle,.status,footer,.result-actions{display:none!important}.result{border:0}.result-label{color:#222}#barcode{width:100%;max-width:600px}}
+
+/* V9.1: full-screen camera controls and barcode alignment guide */
+#cameraPanel:not(.is-processing) .camera-top{position:absolute;top:env(safe-area-inset-top,10px);left:0;right:0;z-index:5;margin:0;padding:12px 16px;background:linear-gradient(#0009,transparent);color:#fff}
+#cameraPanel:not(.is-processing) .camera-stage{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;border-radius:0}
+#cameraPanel:not(.is-processing) .camera-instructions{position:absolute;z-index:5;left:18px;right:18px;bottom:calc(100px + env(safe-area-inset-bottom,0px));margin:0;color:#fff;text-shadow:0 1px 4px #000;text-align:center}
+#cameraPanel:not(.is-processing) .camera-controls{display:flex;position:absolute;z-index:6;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);justify-content:center;align-items:center;gap:12px;padding:14px 16px 22px;background:linear-gradient(transparent,#000b)}
+#cameraPanel:not(.is-processing) .camera-controls .capture{min-height:56px;min-width:min(78vw,340px);border-radius:999px;font-size:17px;box-shadow:0 2px 12px #0005}
+#cameraPanel:not(.is-processing) .camera-controls .closecam{min-height:48px}
+#cameraPanel:not(.is-processing) .aim-overlay{display:flex;position:absolute;inset:0;z-index:2;align-items:center;justify-content:center;pointer-events:none}
+#cameraPanel:not(.is-processing) .aim-frame{width:88%;height:16%;max-height:140px;border:2px solid #ffffffb8;border-radius:12px;box-shadow:0 0 0 9999px #00000008;position:relative}
+#cameraPanel:not(.is-processing) .aim-frame .corner{position:absolute;width:24px;height:24px;border-color:#1684ff;border-style:solid;border-width:0}
+#cameraPanel:not(.is-processing) .aim-frame .corner.tl{top:-2px;left:-2px;border-top-width:4px;border-left-width:4px;border-top-left-radius:8px}
+#cameraPanel:not(.is-processing) .aim-frame .corner.tr{top:-2px;right:-2px;border-top-width:4px;border-right-width:4px;border-top-right-radius:8px}
+#cameraPanel:not(.is-processing) .aim-frame .corner.bl{bottom:-2px;left:-2px;border-bottom-width:4px;border-left-width:4px;border-bottom-left-radius:8px}
+#cameraPanel:not(.is-processing) .aim-frame .corner.br{bottom:-2px;right:-2px;border-bottom-width:4px;border-right-width:4px;border-bottom-right-radius:8px}
+#cameraPanel:not(.is-processing) .aim-frame .aim-line{position:absolute;left:0;right:0;top:50%;height:1px;background:#1684ff99}
 </style>
 </head>
 <body>
@@ -140,7 +156,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V9.0 · GROP3</footer>
+  <footer>Barcode Generator V9.1 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
