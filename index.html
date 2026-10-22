@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V8.9 · GROP3</title>
+<title>Barcode Generator V9.0 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -36,7 +36,7 @@ hr{border:0;border-top:1px solid var(--line);margin:0 0 25px}
 .note{color:var(--muted);font-size:13px;line-height:1.5;margin:12px 2px}
 .toast{color:#b42318;min-height:22px;text-align:center;margin:12px 0 0;font-size:14px;line-height:1.4}
 footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
-#cameraPanel{display:none;margin:15px 0 25px;background:#111827;border-radius:20px;padding:12px;color:#fff;overflow:hidden}
+#cameraPanel{display:none;position:fixed;inset:0;z-index:9999;margin:0;padding:0;background:#000;color:#fff;overflow:hidden;border-radius:0;width:100vw;height:100vh;height:100dvh;max-height:none}
 .camera-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin:2px 3px 12px}
 .processing-screen{display:none;position:relative;min-height:clamp(270px,62vw,440px);max-height:65vh;overflow:hidden;border-radius:12px;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#fff;isolation:isolate}.processing-screen:before{content:none}.mascot-art{width:min(100%,340px);height:clamp(205px,52vw,290px);display:flex;align-items:center;justify-content:center}.mascot-art svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 8px 8px #0b74d01a);animation:mascotBounce .8s ease-in-out infinite alternate}.mascot-walk{animation:mascotSway .72s ease-in-out infinite alternate}.mascot-walk svg{transform-origin:50% 75%}.mascot-art:after{content:"";position:absolute;width:18px;height:8px;border-radius:50%;background:#72c8ff;opacity:0;animation:iceDroplets 1.3s ease-out infinite;box-shadow:10px -15px 0 -2px #9edcff,-9px -8px 0 -3px #4aaeff;pointer-events:none}@keyframes mascotSway{from{transform:translateY(2px) rotate(-1deg)}to{transform:translateY(-4px) rotate(1deg)}}@keyframes iceDroplets{0%{opacity:0;transform:translate(38px,-18px) scale(.5)}25%{opacity:.55}100%{opacity:0;transform:translate(55px,-38px) scale(1)}}.processing-screen .processing-title{font-size:clamp(29px,7vw,38px);font-weight:800;letter-spacing:-.6px;text-align:center;color:#1877f2;background:none;-webkit-text-fill-color:#1877f2;text-shadow:none}.processing-screen .processing-subtitle{font-size:14px;color:#64748b;text-align:center;margin:0 16px 18px}
 .processing-screen:before{content:"";position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent 0 22%,#8b5cf633 25%,transparent 31% 48%,#22d3ee33 52%,transparent 58% 75%,#fb718533 80%,transparent 86%);animation:snailGalaxy 2.2s linear infinite;z-index:-1}
@@ -58,8 +58,8 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
 @keyframes speedLines{to{transform:translateX(28%)}}
 @keyframes processingDots{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}
 @media(prefers-reduced-motion:reduce){.snail-emoji,.snail-orbit,.snail-track:before,.snail-track:after,.speed-lines,.processing-screen:before{animation-duration:2s}}
-.camera-stage{position:relative;width:100%;overflow:hidden;border-radius:12px;background:#05070b;aspect-ratio:3/4;max-height:65vh;display:flex;align-items:center;justify-content:center}
-#cameraVideo{width:100%;height:100%;object-fit:contain}
+.camera-stage{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;border-radius:0;background:#000;aspect-ratio:auto;max-height:none;display:flex;align-items:center;justify-content:center}
+#cameraVideo{width:100%;height:100%;object-fit:cover}
 .aim-overlay{display:none}
 .aim-frame{width:88%;height:23%;position:relative;border:0}
 .corner{position:absolute;width:28px;height:28px;border-color:#65a5ff;border-style:solid}
@@ -140,7 +140,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V8.9 · GROP3</footer>
+  <footer>Barcode Generator V9.0 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -198,7 +198,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
          if(t&&t.applyConstraints&&Array.isArray(caps.focusMode)&&caps.focusMode.includes('single-shot'))await t.applyConstraints({advanced:[{focusMode:'single-shot'}]});
        }catch(_){}
      });
-     await video.play();cameraPanel.scrollIntoView({behavior:'smooth',block:'center'});tell('Câmara pronta. Centra os 9 algarismos na mira e tira a fotografia.');
+     await video.play();document.body.classList.add('camera-open');tell('Câmara pronta. Enquadra os 9 algarismos e tira a fotografia.');
      cameraSession++;
    }catch(e){tell('Não foi possível abrir a câmara. Permite o acesso à câmara nas definições do navegador e tenta novamente.')}
  }
@@ -206,7 +206,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
    cameraSession++;
    if(autoScanTimer){clearTimeout(autoScanTimer);autoScanTimer=null}
    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
-   video.srcObject=null;cameraPanel.style.display='none';document.getElementById('cameraBtn').classList.add('primary');
+   video.srcObject=null;cameraPanel.style.display='none';document.body.classList.remove('camera-open');document.getElementById('cameraBtn').classList.add('primary');
  }
  function cropAndPrepare(source,centerOnly){
    const sw=source.videoWidth||source.naturalWidth||source.width, sh=source.videoHeight||source.naturalHeight||source.height;
