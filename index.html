@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V9.4 · GROP3</title>
+<title>Barcode Generator V9.5 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -163,7 +163,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V9.4 · GROP3</footer>
+  <footer>Barcode Generator V9.5 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js">
 const historyToggle=document.getElementById('historyToggle');
@@ -296,7 +296,7 @@ historyToggle.addEventListener('click',()=>{
    if(workerPromise)return workerPromise;
    workerPromise=(async()=>{
      if(!window.Tesseract)throw new Error('A biblioteca OCR não carregou. Verifica a ligação à Internet.');
-     worker=await Tesseract.createWorker('eng',1,{logger:m=>{
+     worker=await Tesseract.createWorker('eng',1,{langPath:'https://tessdata.projectnaptha.com/4.0.0_fast',logger:m=>{
        if(m.status==='recognizing text'&&typeof m.progress==='number')tell('A reconhecer algarismos… '+Math.round(m.progress*100)+'%');
        else if(m.status==='loading language traineddata'||m.status==='loading tesseract core')tell('A preparar o motor OCR enquanto a câmara está aberta…');
        else if(m.status==='initializing tesseract')tell('A iniciar o motor OCR…');
@@ -348,11 +348,11 @@ historyToggle.addEventListener('click',()=>{
        }
        return canvas;
      }
-     // Fast path: first inspect only the camera reticle area, where the 9 digits should be.
-     // Smaller OCR input means less image processing; full-frame passes remain as fallbacks.
-     function makeVariant(x,y,cw,ch,mode,maxSide=1050){
+     // Analyse full image and broad regions: the reticle can be misaligned with the camera sensor crop.
+     // Try normal grayscale, high contrast and inverted contrast at several page segmentation modes.
+     function makeVariant(x,y,cw,ch,mode){
        const canvas=document.createElement('canvas');
-       const scale=Math.min(1.5,Math.max(.7,maxSide/Math.max(cw,ch)));
+       const scale=Math.min(1.8,Math.max(1,1500/Math.max(cw,ch)));
        canvas.width=Math.max(1,Math.round(cw*scale));canvas.height=Math.max(1,Math.round(ch*scale));
        const ctx=canvas.getContext('2d',{willReadFrequently:true});
        ctx.drawImage(source,x,y,cw,ch,0,0,canvas.width,canvas.height);
@@ -361,18 +361,21 @@ historyToggle.addEventListener('click',()=>{
          let sum=0;for(let i=0;i<d.length;i+=4)sum+=.299*d[i]+.587*d[i+1]+.114*d[i+2];
          const avg=sum/(d.length/4),threshold=Math.max(95,Math.min(205,avg*.90));
          for(let i=0;i<d.length;i+=4){
-           const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];
-           const v=mode==='contrast'?(g>threshold?255:0):mode==='invert'?(g>threshold?0:255):g;
-           d[i]=d[i+1]=d[i+2]=v;
+           let g=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+           if(mode==='contrast')g=g>threshold?255:0;
+           if(mode==='invert')g=g>threshold?0:255;
+           d[i]=d[i+1]=d[i+2]=g;
          }
          ctx.putImageData(im,0,0);
        }
        return canvas;
      }
+     // Fast path: start with the whole image at a controlled resolution, then use two focused fallbacks.
+     // Fewer, smaller OCR inputs reduce latency while preserving recovery options.
      const variants=[
-       {name:'Zona das algarismos',build:()=>makeVariant(Math.round(sw*.06),Math.round(sh*.34),Math.round(sw*.88),Math.round(sh*.28),'normal',900),psm:'7'},
-       {name:'Imagem completa',build:()=>makeVariant(0,0,sw,sh,'normal',1200),psm:'7'},
-       {name:'Zona central alto contraste',build:()=>makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'contrast',1000),psm:'7'},
+       {name:'Imagem completa',build:()=>makeVariant(0,0,sw,sh,'normal'),psm:'7'},
+       {name:'Zona central',build:()=>makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'normal'),psm:'6'},
+       {name:'Zona central alto contraste',build:()=>makeVariant(Math.round(sw*.04),Math.round(sh*.20),Math.round(sw*.92),Math.round(sh*.60),'contrast'),psm:'7'},
      ];
      let rawReports=[],scores=new Map(),totalConfidence=[];
      for(let i=0;i<variants.length;i++){
