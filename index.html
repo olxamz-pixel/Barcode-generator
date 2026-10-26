@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V9.2 · GROP3</title>
+<title>Barcode Generator V9.3 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -163,7 +163,7 @@ footer{text-align:center;color:#a0a8b5;font-size:13px;margin-top:25px}
     </details>
     <p id="diagMeta" style="font-size:13px;line-height:1.45;margin:8px 0">Esta informação ajuda a perceber em que passo a leitura falha.</p><div id="candidateChoices" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
   </section>
-  <footer>Barcode Generator V9.2 · GROP3</footer>
+  <footer>Barcode Generator V9.3 · GROP3</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js">
 const historyToggle=document.getElementById('historyToggle');
@@ -181,7 +181,7 @@ historyToggle.addEventListener('click',()=>{
  const input=document.getElementById('number'), form=document.getElementById('entryForm'), msg=document.getElementById('message');
  const recentBox=document.getElementById('recents'), cameraPanel=document.getElementById('cameraPanel');
  const video=document.getElementById('cameraVideo'), photoFile=document.getElementById('photoFile');
- let recent=[], stream=null, worker=null, busy=false, autoScanTimer=null, cameraSession=0;
+ let recent=[], stream=null, worker=null, workerPromise=null, busy=false, autoScanTimer=null, cameraSession=0;
  try { recent=JSON.parse(localStorage.getItem('barcodeRecent')||'[]').filter(x=>/^\d{9}$/.test(x)); } catch(e){}
  function tell(s){msg.textContent=s}
  function setStatus(s){document.getElementById('statusText').textContent=s}
@@ -231,6 +231,8 @@ historyToggle.addEventListener('click',()=>{
        }catch(_){}
      });
      await video.play();document.body.classList.add('camera-open');tell('Câmara pronta. Enquadra os 9 algarismos e tira a fotografia.');
+     // Preload OCR in parallel while the user frames the barcode, instead of after capture.
+     getWorker().catch(e=>{console.warn('OCR prewarm:',e);tell('A câmara está pronta; o motor OCR será novamente tentado ao capturar.');});
      cameraSession++;
    }catch(e){tell('Não foi possível abrir a câmara. Permite o acesso à câmara nas definições do navegador e tenta novamente.')}
  }
@@ -291,14 +293,18 @@ historyToggle.addEventListener('click',()=>{
  }
  async function getWorker(){
    if(worker)return worker;
-   tell('A carregar o motor de leitura. Na primeira utilização pode demorar até 30 segundos…');
-   worker=await Tesseract.createWorker('eng',1,{logger:m=>{
-     if(m.status==='recognizing text'&&typeof m.progress==='number')tell('A reconhecer algarismos… '+Math.round(m.progress*100)+'%');
-     else if(m.status==='loading language traineddata'||m.status==='loading tesseract core')tell('A preparar o motor OCR…');
-     else if(m.status==='initializing tesseract')tell('A iniciar o motor OCR…');
-   }});
-   await worker.setParameters({tessedit_char_whitelist:'0123456789',tessedit_pageseg_mode:'11',preserve_interword_spaces:'1',user_defined_dpi:'300'});
-   return worker;
+   if(workerPromise)return workerPromise;
+   workerPromise=(async()=>{
+     if(!window.Tesseract)throw new Error('A biblioteca OCR não carregou. Verifica a ligação à Internet.');
+     worker=await Tesseract.createWorker('eng',1,{logger:m=>{
+       if(m.status==='recognizing text'&&typeof m.progress==='number')tell('A reconhecer algarismos… '+Math.round(m.progress*100)+'%');
+       else if(m.status==='loading language traineddata'||m.status==='loading tesseract core')tell('A preparar o motor OCR enquanto a câmara está aberta…');
+       else if(m.status==='initializing tesseract')tell('A iniciar o motor OCR…');
+     }});
+     await worker.setParameters({tessedit_char_whitelist:'0123456789',tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',user_defined_dpi:'300'});
+     return worker;
+   })();
+   try{return await workerPromise}catch(e){worker=null;workerPromise=null;throw e}
  }
  async function processImage(file,fromCamera,automatic=false){
    if(busy)return;
