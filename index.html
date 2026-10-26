@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f8fafc">
-<title>Barcode Generator V9.5 · GROP3</title>
+<title>Barcode Generator V9.6 · GROP3</title>
 <style>
 :root{--ink:#172033;--muted:#718096;--line:#e2e8f0;--blue:#2860e8;--green:#21834f}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(#f8fafc,#fff);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
@@ -296,7 +296,7 @@ historyToggle.addEventListener('click',()=>{
    if(workerPromise)return workerPromise;
    workerPromise=(async()=>{
      if(!window.Tesseract)throw new Error('A biblioteca OCR não carregou. Verifica a ligação à Internet.');
-     worker=await Tesseract.createWorker('eng',1,{langPath:'https://tessdata.projectnaptha.com/4.0.0_fast',logger:m=>{
+     worker=await Tesseract.createWorker('eng',1,{logger:m=>{
        if(m.status==='recognizing text'&&typeof m.progress==='number')tell('A reconhecer algarismos… '+Math.round(m.progress*100)+'%');
        else if(m.status==='loading language traineddata'||m.status==='loading tesseract core')tell('A preparar o motor OCR enquanto a câmara está aberta…');
        else if(m.status==='initializing tesseract')tell('A iniciar o motor OCR…');
@@ -350,9 +350,10 @@ historyToggle.addEventListener('click',()=>{
      }
      // Analyse full image and broad regions: the reticle can be misaligned with the camera sensor crop.
      // Try normal grayscale, high contrast and inverted contrast at several page segmentation modes.
-     function makeVariant(x,y,cw,ch,mode){
+     function makeVariant(x,y,cw,ch,mode,maxSide=1500){
        const canvas=document.createElement('canvas');
-       const scale=Math.min(1.8,Math.max(1,1500/Math.max(cw,ch)));
+       // Downscale large camera frames instead of processing every 4K pixel.
+       const scale=Math.min(1.5,maxSide/Math.max(cw,ch));
        canvas.width=Math.max(1,Math.round(cw*scale));canvas.height=Math.max(1,Math.round(ch*scale));
        const ctx=canvas.getContext('2d',{willReadFrequently:true});
        ctx.drawImage(source,x,y,cw,ch,0,0,canvas.width,canvas.height);
